@@ -6,7 +6,6 @@ import argparse
 import time
 import sys
 sys.path.append("../../..")
-from my_packages import nas_file_controller
 
 
 def makeDateList(year1, year2, month1, month2):
@@ -54,9 +53,11 @@ def makeDateList(year1, year2, month1, month2):
 
     return yearmonth
 
+def make_date_dir(path):
+    pass
 
 if __name__ == "__main__":
-    IS_TEST = True
+    IS_TEST = False
     IS_DRY_RUN = True
 
     parser = argparse.ArgumentParser(description='期間を指定してレースの開催日に基づくディレクトリを作成する')
@@ -77,17 +78,14 @@ if __name__ == "__main__":
     else:
         save_dir = "data/race"
         log_dir = "data/race/log"
-    yearmonth = [("2022", "4")]
     for y, m in yearmonth:
         date_list = raceDateGetter.getRaceDate(year=y, month=m)
         for date in date_list:
             dir_path = os.path.join(save_dir, date[:4], date[4:6], date[6:8])
+            print(dir_path)
 
-            fsc = nas_file_controller.FileServerCliant()
-            if not IS_DRY_RUN:
-                fsc.mkdir(dir_path)
-            else:
-                print(dir_path)
-                pass
+            #TODO: ファイル保存部分は後に変更予定
+            make_date_dir(dir_path)
+
 
         time.sleep(1)

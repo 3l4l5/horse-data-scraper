@@ -13,12 +13,10 @@ ENV WORKDIR /horse/
 
 WORKDIR ${WORKDIR}
 
-COPY Pipfile ${WORKDIR}
-COPY Pipfile.lock ${WORKDIR}
-COPY ./horse/data_downloader/horse/ ${WORKDIR}
+COPY ./requirements.txt ${WORKDIR}
+COPY ./horseDataScraper/ ${WORKDIR}
+COPY ./bin/ ${WORKDIR}
 
-RUN pip install pipenv --no-cache-dir && \
-    pipenv install --system --deploy && \
-    pip3 uninstall -y pipenv virtualenv-clone virtualenv
+RUN pip install -r requirements.txt
 WORKDIR /horse/bin
-CMD /bin/sh autoHorseScrape.sh
+CMD /bin/sh autoScrape.sh
