@@ -1,4 +1,3 @@
-import socket
 import os
 import glob
 import json
@@ -17,18 +16,11 @@ def getHorseHtml(horse_id):
     return response.text
 
 if __name__ == "__main__":
+    MOUNT_POINT = os.environ["MOUNT_POINT"]
     NOW = datetime.now().strftime('%Y-%m-%d-%H-%M')
-    if os.path.exists(os.path.join("..", "IS_TEST")):
-        race_dir = os.path.join("..", "test", "data")
-        os.makedirs(race_dir, exist_ok=True)
-    elif os.path.exists(os.path.join("..", "IS_PROD")):
-        host = socket.gethostname()
-        if "Mac" in host:
-            race_dir = os.path.join(os.environ['HOME'], "nas",  "project", "horse", "data", "race")
-            horse_dir = os.path.join(os.environ['HOME'], "nas",  "project", "horse", "data", "horse")
-        else:
-            race_dir = os.path.join("/nas",  "project", "horse", "data", "race")
-            horse_dir = os.path.join("/nas",  "project", "horse", "data", "horse")
+
+    race_dir = os.path.join(MOUNT_POINT, "data", "race")
+    horse_dir = os.path.join(MOUNT_POINT, "data", "horse")
 
     log_dir = os.path.join(race_dir, "log")
     data_dirs = list(set(glob.glob(os.path.join(race_dir, "*"))) - set([log_dir]))
@@ -36,22 +28,22 @@ if __name__ == "__main__":
     # キーをrace_id,
     horse_id_dict = {}
 
+    horse_log_filename_list = [os.path.basename(path) for path in glob.glob(os.path.join(horse_dir, "log", "*"))]
     # 各logファイルに対して出場馬を取得
     for race_log_path in race_logs_path:
-        # race_logに存在して、horse_logに存在しないものを取得
-        if os.path.basename(race_log_path) not in [os.path.basename(path) for path in glob.glob(os.path.join(horse_dir, "log", "*"))]:
-            print(race_log_path)
+        # 新しく取得されたrace_idについて
+        if not os.path.basename(race_log_path) in horse_log_filename_list:
             with open(race_log_path, "r") as f:
                 log = json.load(f)
                 target_race_ids = log["gotten_data"]
             race_html_paths = []
-
             for data_dir in data_dirs:
                 race_html_paths += glob.glob(os.path.join(data_dir, "*", "*", "*.html"))
             target_html_paths = [path for path in race_html_paths if os.path.basename(path).split(".")[0] in target_race_ids]
 
             horse_id_list = []
-            for target_html_path in tqdm(target_html_paths[:]):
+            for target_html_path in tqdm(target_html_paths):
+                print(target_html_path)
                 with open(target_html_path, "r") as f:
                     html_text = f.read()
                 soup = BeautifulSoup(html_text, features="lxml")
@@ -59,7 +51,6 @@ if __name__ == "__main__":
                 a_list = []
                 for tr in tr_list:
                     a_list += tr.find_all("a")
-
                 pattern =  '(?<=/horse/)\d+?(?=/)'
                 for a in a_list:
                     horse_id = re.findall(pattern, a.get("href"))
@@ -85,6 +76,3 @@ if __name__ == "__main__":
         horse_log_dir = "/".join(log_dir_split)
         with open(horse_log_dir, "w") as f:
             json.dump({"horse_id": scrape_horse_id_list}, f, indent=4)
-
-
-
