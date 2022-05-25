@@ -54,11 +54,12 @@ def makeDateList(year1, year2, month1, month2):
     return yearmonth
 
 def make_date_dir(path):
-    pass
+    os.makedirs(path, exist_ok=True)
 
 if __name__ == "__main__":
     IS_TEST = False
     IS_DRY_RUN = True
+    MOUNT_POINT = os.environ["MOUNT_POINT"]
 
     parser = argparse.ArgumentParser(description='期間を指定してレースの開催日に基づくディレクトリを作成する')
     # 3. parser.add_argumentで受け取る引数を追加していく
@@ -81,11 +82,9 @@ if __name__ == "__main__":
     for y, m in yearmonth:
         date_list = raceDateGetter.getRaceDate(year=y, month=m)
         for date in date_list:
-            dir_path = os.path.join(save_dir, date[:4], date[4:6], date[6:8])
+            dir_path = os.path.join(MOUNT_POINT, save_dir, date[:4], date[4:6], date[6:8])
             print(dir_path)
 
             #TODO: ファイル保存部分は後に変更予定
             make_date_dir(dir_path)
-
-
         time.sleep(1)
