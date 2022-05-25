@@ -6,5 +6,4 @@ def getRaceHtml(race_id):
     url = base_url + race_id
     response = requests.get(url)
     response.encoding = response.apparent_encoding
-    print(url)
     return response.text
