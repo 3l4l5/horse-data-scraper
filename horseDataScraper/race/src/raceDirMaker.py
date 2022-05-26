@@ -7,6 +7,9 @@ import time
 import sys
 sys.path.append("../../..")
 
+IS_TEST = False
+IS_DRY_RUN = True
+MOUNT_POINT = os.environ["MOUNT_POINT"]
 
 def makeDateList(year1, year2, month1, month2):
     if year2:
@@ -56,11 +59,19 @@ def makeDateList(year1, year2, month1, month2):
 def make_date_dir(path):
     os.makedirs(path, exist_ok=True)
 
-if __name__ == "__main__":
-    IS_TEST = False
-    IS_DRY_RUN = True
-    MOUNT_POINT = os.environ["MOUNT_POINT"]
+def make_dir_this_month(is_test, is_dry_run):
+    save_dir = "test/data/race" if is_test else "data/race"
+    today = datetime.now()
+    date_list = raceDateGetter.getRaceDate(year=str(today.year), month=str(today.month))
+    for date in date_list:
+        dir_path = os.path.join(MOUNT_POINT, save_dir, date[:4], date[4:6], date[6:8])
+        #TODO: ファイル保存部分は後に変更予定
+        if not is_dry_run:
+            make_date_dir(dir_path)
+        else:
+            pass
 
+def main():
     parser = argparse.ArgumentParser(description='期間を指定してレースの開催日に基づくディレクトリを作成する')
     # 3. parser.add_argumentで受け取る引数を追加していく
     parser.add_argument('-y1', '--year1', type=int, help='取得したい年')    # 必須の引数を追加
@@ -88,3 +99,6 @@ if __name__ == "__main__":
             #TODO: ファイル保存部分は後に変更予定
             make_date_dir(dir_path)
         time.sleep(1)
+
+if __name__ == "__main__":
+    main()
