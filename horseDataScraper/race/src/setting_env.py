@@ -1,2 +1,2 @@
-IS_TEST = True
+IS_TEST = False
 IS_DRY_RUN = False
