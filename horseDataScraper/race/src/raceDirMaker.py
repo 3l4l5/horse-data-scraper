@@ -4,11 +4,10 @@ import os
 import my_lib.raceDateGetter as raceDateGetter
 import argparse
 import time
-import sys
-sys.path.append("../../..")
+import setting_env
 
-IS_TEST = False
-IS_DRY_RUN = True
+IS_TEST = setting_env.IS_TEST
+IS_DRY_RUN = setting_env.IS_DRY_RUN
 MOUNT_POINT = os.environ["MOUNT_POINT"]
 
 def makeDateList(year1, year2, month1, month2):
@@ -71,14 +70,7 @@ def make_dir_this_month(is_test, is_dry_run):
         else:
             pass
 
-def main():
-    parser = argparse.ArgumentParser(description='期間を指定してレースの開催日に基づくディレクトリを作成する')
-    # 3. parser.add_argumentで受け取る引数を追加していく
-    parser.add_argument('-y1', '--year1', type=int, help='取得したい年')    # 必須の引数を追加
-    parser.add_argument('-m1', '--month1', type=int, help='取得したい月（指定のない場合、一年間のデータを取得する）')
-    parser.add_argument('-y2', '--year2', type=int, help='複数年の取得を行いたい場合は終わりの年')
-    parser.add_argument('-m2', '--month2', type=int, help='複数月取得したい場合は終わりの月')
-    args = parser.parse_args()
+def main(args):
     if args.year1 is None and args.year2 is None and args.month1 is None and args.month2 is None:
         today = datetime.now()
         yearmonth = [(str(today.year), str(today.month))]
@@ -101,4 +93,11 @@ def main():
         time.sleep(1)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='期間を指定してレースの開催日に基づくディレクトリを作成する')
+    # 3. parser.add_argumentで受け取る引数を追加していく
+    parser.add_argument('-y1', '--year1', type=int, help='取得したい年')    # 必須の引数を追加
+    parser.add_argument('-m1', '--month1', type=int, help='取得したい月（指定のない場合、一年間のデータを取得する）')
+    parser.add_argument('-y2', '--year2', type=int, help='複数年の取得を行いたい場合は終わりの年')
+    parser.add_argument('-m2', '--month2', type=int, help='複数月取得したい場合は終わりの月')
+    args = parser.parse_args()
+    main(args)
