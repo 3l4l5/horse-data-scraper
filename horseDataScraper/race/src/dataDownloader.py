@@ -5,9 +5,9 @@ from my_lib import raceDataGetter
 from datetime import datetime
 from tqdm import tqdm
 
-def data_downloader():
-    IS_TEST = False
-    IS_DRY_RUN = False
+def data_downloader(is_test, is_dry_run):
+    IS_TEST = is_test
+    IS_DRY_RUN = is_dry_run
     NOW = datetime.now().strftime('%Y-%m-%d-%H-%M')
     mount_point = os.environ["MOUNT_POINT"]
     if IS_TEST:
@@ -58,4 +58,4 @@ def data_downloader():
                     pass
 
 if __name__ == "__main__":
-    data_downloader()
+    data_downloader(is_test=False, is_dry_run=False)
