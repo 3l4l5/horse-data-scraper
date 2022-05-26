@@ -18,32 +18,51 @@ def getHorseHtml(horse_id):
 if __name__ == "__main__":
     MOUNT_POINT = os.environ["MOUNT_POINT"]
     NOW = datetime.now().strftime('%Y-%m-%d-%H-%M')
+    IS_TEST = True
 
-    race_dir = os.path.join(MOUNT_POINT, "data", "race")
-    horse_dir = os.path.join(MOUNT_POINT, "data", "horse")
+    if not IS_TEST:
+        race_dir = os.path.join(MOUNT_POINT, "data", "race")
+        horse_dir = os.path.join(MOUNT_POINT, "data", "horse")
+    else:
+        race_dir = os.path.join(MOUNT_POINT, "test", "data", "race")
+        horse_dir = os.path.join(MOUNT_POINT, "test" ,"data", "horse")
 
     log_dir = os.path.join(race_dir, "log")
+
+    if not os.path.exists(race_dir):
+        os.makedirs(race_dir)
+    if not os.path.exists(horse_dir):
+        os.makedirs(horse_dir)
+
+    # NOTE: race_dirの中のlog_dirを消す
     data_dirs = list(set(glob.glob(os.path.join(race_dir, "*"))) - set([log_dir]))
     race_logs_path = glob.glob(os.path.join(log_dir, "*"))
     # キーをrace_id,
     horse_id_dict = {}
-
     horse_log_filename_list = [os.path.basename(path) for path in glob.glob(os.path.join(horse_dir, "log", "*"))]
+
+    print("preparing horse id list")
     # 各logファイルに対して出場馬を取得
     for race_log_path in race_logs_path:
-        # 新しく取得されたrace_idについて
+        # 新たに取得されたレースIDをフィルタリング
         if not os.path.basename(race_log_path) in horse_log_filename_list:
             with open(race_log_path, "r") as f:
                 log = json.load(f)
                 target_race_ids = log["gotten_data"]
-            race_html_paths = []
+            all_race_html_paths = []
             for data_dir in data_dirs:
-                race_html_paths += glob.glob(os.path.join(data_dir, "*", "*", "*.html"))
-            target_html_paths = [path for path in race_html_paths if os.path.basename(path).split(".")[0] in target_race_ids]
+                all_race_html_paths += glob.glob(os.path.join(data_dir, "*", "*", "*.html"))
 
+            # 最近取得したレースデータへのpathのリストを作成
+            target_html_paths = []
+            for race_html_path in all_race_html_paths:
+                race_id = os.path.basename(race_html_path).split(".")[0]
+                if race_id in target_race_ids:
+                    target_html_paths.append(race_html_path)
+
+            # 実際に今回取得するhorse_idのリストを作成する
             horse_id_list = []
-            for target_html_path in tqdm(target_html_paths):
-                print(target_html_path)
+            for target_html_path in target_html_paths:
                 with open(target_html_path, "r") as f:
                     html_text = f.read()
                 soup = BeautifulSoup(html_text, features="lxml")
@@ -56,7 +75,7 @@ if __name__ == "__main__":
                     horse_id = re.findall(pattern, a.get("href"))
                     if horse_id:
                         horse_id_list.append(horse_id[0])
-            horse_data_dir = os.path.join(horse_dir, "data")
+
             horse_id_dict[race_log_path] = horse_id_list
 
     scrape_horse_id_list = []
@@ -73,6 +92,6 @@ if __name__ == "__main__":
         # horselogファイルの作成
         log_dir_split = race_log_path.split(os.sep)
         log_dir_split[-3] = "horse"
-        horse_log_dir = "/".join(log_dir_split)
+        horse_log_dir = os.sep.join(log_dir_split)
         with open(horse_log_dir, "w") as f:
             json.dump({"horse_id": scrape_horse_id_list}, f, indent=4)
