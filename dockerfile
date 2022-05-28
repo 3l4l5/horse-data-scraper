@@ -9,14 +9,12 @@ RUN apt-get update && \
     python3\
     python-pip
 
-ENV WORKDIR /horse/
+ENV WORKDIR /horseDataScraper/
 
 WORKDIR ${WORKDIR}
 
 COPY ./requirements.txt ${WORKDIR}
 COPY ./horseDataScraper/ ${WORKDIR}
-COPY ./bin/ ${WORKDIR}
 
 RUN pip install -r requirements.txt
-WORKDIR /horse/bin
-CMD /bin/sh autoScrape.sh
+CMD python data_scraper.py
