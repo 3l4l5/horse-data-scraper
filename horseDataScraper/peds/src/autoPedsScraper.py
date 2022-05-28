@@ -30,6 +30,7 @@ def peds_scraper(is_test, is_dry_run):
         race_dir = os.path.join(MOUNT_POINT, "test", "data", "race")
         horse_dir = os.path.join(MOUNT_POINT, "test", "data", "horse")
         peds_dir = os.path.join(MOUNT_POINT, "test", "data", "peds")
+    os.makedirs(peds_dir, exist_ok=True)
 
     horse_dirs = glob.glob(os.path.join(horse_dir, "data", "*"))
     peds_dirs = glob.glob(os.path.join(peds_dir, "*"))
@@ -41,9 +42,9 @@ def peds_scraper(is_test, is_dry_run):
     for horse_id in tqdm(get_id_list):
         peds_html = getPedsHtml(horse_id)
         time.sleep(1)
-        os.makedirs(peds_dir, exist_ok=True)
         with open(os.path.join(peds_dir, horse_id+".html"), "w") as f:
             f.write(peds_html)
+    return get_id_list
 
 if __name__ == "__main__":
     peds_scraper(is_test=True, is_dry_run=False)

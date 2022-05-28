@@ -81,7 +81,7 @@ def horse_scraper(is_test, is_dry_run):
     scrape_horse_id_list = []
     for race_log_path in horse_id_dict:
         print("scraping {} now".format(race_log_path))
-        for horse_id in tqdm(list(set(horse_id_dict[race_log_path]))[:10]):
+        for horse_id in tqdm(list(set(horse_id_dict[race_log_path]))):
             horse_html = getHorseHtml(horse_id)
             time.sleep(1)
             os.makedirs(os.path.join(horse_dir, "data", horse_id), exist_ok=True)
@@ -98,6 +98,7 @@ def horse_scraper(is_test, is_dry_run):
         os.makedirs(horse_log_dir, exist_ok=True)
         with open(horse_log_path, "w") as f:
             json.dump({"horse_id": scrape_horse_id_list}, f, indent=4)
+    return scrape_horse_id_list
 
 if __name__ == "__main__":
     horse_scraper(is_test=True)

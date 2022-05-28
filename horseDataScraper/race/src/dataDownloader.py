@@ -58,6 +58,7 @@ def data_downloader(is_test, is_dry_run):
                     json.dump(d, f, indent=4)
                 else:
                     pass
+    return gotten_raceid_list
 
 if __name__ == "__main__":
     IS_TEST = race.src.setting_env.IS_TEST
