@@ -17,8 +17,8 @@ def getPedsHtml(horse_id):
     response.encoding = response.apparent_encoding
     return response.text
 
-if __name__ == "__main__":
-    IS_TEST = True
+def peds_scraper(is_test, is_dry_run):
+    IS_TEST = is_test
     NOW = datetime.now().strftime('%Y-%m-%d-%H-%M')
     MOUNT_POINT = os.environ["MOUNT_POINT"]
 
@@ -36,10 +36,14 @@ if __name__ == "__main__":
 
     # horseを取得している者の中から、pedsで取得できていないものを抽出
     all_horse_ids_set = set([os.path.basename(path) for path in horse_dirs])
-    already_get_horse_ids_set = set([os.path.basename(path) for path in peds_dirs])
+    already_get_horse_ids_set = set([os.path.basename(path).split(".")[0] for path in peds_dirs])
     get_id_list = list(all_horse_ids_set - already_get_horse_ids_set)
     for horse_id in tqdm(get_id_list):
         peds_html = getPedsHtml(horse_id)
         time.sleep(1)
+        os.makedirs(peds_dir, exist_ok=True)
         with open(os.path.join(peds_dir, horse_id+".html"), "w") as f:
             f.write(peds_html)
+
+if __name__ == "__main__":
+    peds_scraper(is_test=True, is_dry_run=False)

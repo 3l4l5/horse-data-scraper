@@ -1,10 +1,11 @@
 import os, glob, json
 from time import sleep
-from my_lib import raceDateGetter
-from my_lib import raceDataGetter
+from race.src.my_lib import raceDateGetter
+from race.src.my_lib import raceDataGetter
 from datetime import datetime
 from tqdm import tqdm
-import setting_env
+
+import race.src.setting_env
 
 def data_downloader(is_test, is_dry_run):
     IS_TEST = is_test
@@ -59,6 +60,6 @@ def data_downloader(is_test, is_dry_run):
                     pass
 
 if __name__ == "__main__":
-    IS_TEST = setting_env.IS_TEST
-    IS_DRY_RUN = setting_env.IS_DRY_RUN
+    IS_TEST = race.src.setting_env.IS_TEST
+    IS_DRY_RUN = race.src.setting_env.IS_DRY_RUN
     data_downloader(is_test=IS_TEST, is_dry_run=IS_TEST)

@@ -15,10 +15,10 @@ def getHorseHtml(horse_id):
     response.encoding = response.apparent_encoding
     return response.text
 
-if __name__ == "__main__":
+def horse_scraper(is_test, is_dry_run):
     MOUNT_POINT = os.environ["MOUNT_POINT"]
     NOW = datetime.now().strftime('%Y-%m-%d-%H-%M')
-    IS_TEST = True
+    IS_TEST = is_test
 
     if not IS_TEST:
         race_dir = os.path.join(MOUNT_POINT, "data", "race")
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     scrape_horse_id_list = []
     for race_log_path in horse_id_dict:
         print("scraping {} now".format(race_log_path))
-        for horse_id in tqdm(list(set(horse_id_dict[race_log_path]))):
+        for horse_id in tqdm(list(set(horse_id_dict[race_log_path]))[:10]):
             horse_html = getHorseHtml(horse_id)
             time.sleep(1)
             os.makedirs(os.path.join(horse_dir, "data", horse_id), exist_ok=True)
@@ -92,6 +92,12 @@ if __name__ == "__main__":
         # horselogファイルの作成
         log_dir_split = race_log_path.split(os.sep)
         log_dir_split[-3] = "horse"
-        horse_log_dir = os.sep.join(log_dir_split)
-        with open(horse_log_dir, "w") as f:
+
+        horse_log_path = os.sep.join(log_dir_split)
+        horse_log_dir = os.sep.join(log_dir_split[:-1])
+        os.makedirs(horse_log_dir, exist_ok=True)
+        with open(horse_log_path, "w") as f:
             json.dump({"horse_id": scrape_horse_id_list}, f, indent=4)
+
+if __name__ == "__main__":
+    horse_scraper(is_test=True)

@@ -1,13 +1,14 @@
 # 年月を指定して、その年月にレースが開催された日を取得し、日にちのフォルダを作成する
 from datetime import datetime
 import os
-import my_lib.raceDateGetter as raceDateGetter
+import race.src.my_lib.raceDateGetter as raceDateGetter
 import argparse
 import time
-import setting_env
 
-IS_TEST = setting_env.IS_TEST
-IS_DRY_RUN = setting_env.IS_DRY_RUN
+import race.src.setting_env
+
+IS_TEST = race.src.setting_env.IS_TEST
+IS_DRY_RUN = race.src.setting_env.IS_DRY_RUN
 MOUNT_POINT = os.environ["MOUNT_POINT"]
 
 def makeDateList(year1, year2, month1, month2):
