@@ -18,26 +18,26 @@ def getPedsHtml(horse_id):
     return response.text
 
 if __name__ == "__main__":
+    IS_TEST = True
     NOW = datetime.now().strftime('%Y-%m-%d-%H-%M')
-    if os.path.exists(os.path.join("..", "IS_TEST")):
-        race_dir = os.path.join("..", "test", "data")
-        os.makedirs(race_dir, exist_ok=True)
-    elif os.path.exists(os.path.join("..", "IS_PROD")):
-        host = socket.gethostname()
-        if "Mac" in host:
-            race_dir = os.path.join(os.environ['HOME'], "nas", "project", "horse", "data", "race")
-            horse_dir = os.path.join(os.environ['HOME'], "nas", "project", "horse", "data", "horse")
-            peds_dir = os.path.join(os.environ['HOME'], "nas", "project", "horse", "data", "peds")
-        else:
-            race_dir = os.path.join("/nas", "project", "horse", "data", "race")
-            horse_dir = os.path.join("/nas", "project", "horse", "data", "horse")
-            peds_dir = os.path.join("/nas", "project", "horse", "data", "peds")
+    MOUNT_POINT = os.environ["MOUNT_POINT"]
+
+    if not IS_TEST:
+        race_dir = os.path.join(MOUNT_POINT, "data", "race")
+        horse_dir = os.path.join(MOUNT_POINT, "data", "horse")
+        peds_dir = os.path.join(MOUNT_POINT, "data", "peds")
+    else:
+        race_dir = os.path.join(MOUNT_POINT, "test", "data", "race")
+        horse_dir = os.path.join(MOUNT_POINT, "test", "data", "horse")
+        peds_dir = os.path.join(MOUNT_POINT, "test", "data", "peds")
 
     horse_dirs = glob.glob(os.path.join(horse_dir, "data", "*"))
     peds_dirs = glob.glob(os.path.join(peds_dir, "*"))
 
     # horseを取得している者の中から、pedsで取得できていないものを抽出
-    get_id_list = list(set([os.path.basename(path) for path in horse_dirs])-set([os.path.basename(path) for path in peds_dirs]))
+    all_horse_ids_set = set([os.path.basename(path) for path in horse_dirs])
+    already_get_horse_ids_set = set([os.path.basename(path) for path in peds_dirs])
+    get_id_list = list(all_horse_ids_set - already_get_horse_ids_set)
     for horse_id in tqdm(get_id_list):
         peds_html = getPedsHtml(horse_id)
         time.sleep(1)
