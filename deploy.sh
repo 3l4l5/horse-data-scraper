@@ -6,3 +6,4 @@ else
     mkdir /project/
     cp -rf  horse-data-scraper/ $PROJECT_DIR
 fi
+bash docker_build.sh
