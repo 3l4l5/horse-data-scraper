@@ -1,0 +1,23 @@
+name: image-build-and-push
+on:
+  push:
+    branches:
+      - main
+env:
+  REGISTRY_URL: container-registry.tool.srkr.dev:443/horse-scraper
+jobs:
+  push-image-to-docker-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Get current date # get the date of the build
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d--%M-%S')"
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag $REGISTRY_URL:${{ steps.date.outputs.date }}
+
+      - name: Docker Push
+        run: docker push $REGISTRY_URL:${{ steps.date.outputs.date }}
